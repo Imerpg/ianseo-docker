@@ -1,14 +1,19 @@
 FROM php:8.5-apache
 
+# Set IANSEO_VERSION as a build argument and environment variable
 ARG IANSEO_VERSION
 ENV IANSEO_VERSION=$IANSEO_VERSION
+# ---------------------------------------------------------------
 
-# Dépendances système et client MySQL
+# Install dependencies and clean up apt cache to reduce image size
 RUN apt-get update && apt-get install -y \
+    # Basic tools
     unzip \
     curl \
     dos2unix \
+    # client MySQL for command line
     default-mysql-client \
+    # lib php
     libicu-dev \
     libmagickwand-dev \
     libpng-dev \
@@ -19,18 +24,32 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
+# ------------------------------------------------------------------
 
-# Extensions PHP
+# Install extensions PHP (intl, gd, mysqli, pdo_mysql, zip, gettext)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j$(nproc) intl gd mysqli pdo_mysql zip gettext
+    && docker-php-ext-install -j$(nproc) \
+    intl \
+    gd \
+    mysqli \
+    pdo_mysql \
+    zip \
+    gettext
+# ------------------------------------------------------------------
 
-RUN pecl install imagick && docker-php-ext-enable imagick
+# Install Imagick (PECL)
+RUN pecl install imagick \
+    && docker-php-ext-enable imagick
+# ----------------------
 
-# Configuration Apache & Entrypoint
+# Drop in an assortment of configuration information and the ianseo files
 COPY web/ianseo.conf /etc/apache2/conf-available/
-COPY web/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY web/php.ini /usr/local/etc/php/
+COPY web/phpinfo.php /tmp
+# -----------------------------------------------------------------------
 
-RUN dos2unix /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
-RUN a2enconf -q ianseo
+    
+COPY web/web_prep.sh /usr/local/bin/web_prep.sh
+RUN chmod +x /usr/local/bin/web_prep.sh
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/web_prep.sh"]
