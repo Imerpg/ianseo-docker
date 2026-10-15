@@ -1,19 +1,34 @@
-# ianseo-install
+# 🎯 Ianseo-Install
 
-Ce dépôt contient les définitions Docker nécessaires pour déployer rapidement une instance **Ianseo** prête à l'emploi avec un conteneur PHP/Apache et une base de données MySQL.
+> **Déploiement simple, rapide et 100 % Dockerisé d'Ianseo.**  
+> Conservez un ordinateur hôte propre sans dépendances locales à installer.
+
+---
+
+## 📋 Prochaines évolutions (Roadmap)
+
+- [ ] Mettre à jour Ianseo automatiquement dès le lancement pour éviter de devoir cliquer sur _"Mettre à jour Ianseo"_ dans les modules.
+- [ ] Ajouter un tutoriel d'installation de Docker depuis le site officiel.
+- [ ] Créer un script d'automatisation pour lancer `docker compose` en une seule commande.
+
+---
+
+## ℹ️ À propos d'Ianseo & d'Archery Nexus
 
 > **Ianseo** est la solution _open source_ de référence pour la gestion des compétitions de tir à l'arc, en conformité avec les règlements de la **World Archery**. Bien qu'il demeure le logiciel le plus employé à l'échelle mondiale, sa conception datant de 2000 (en PHP et JavaScript natifs) le rend aujourd'hui obsolète sur les plans de l'UI/UX et des performances. Son manque d'ergonomie et sa prise en main laborieuse sont aujourd'hui largement décriés.
 >
-> 🔗 [Lien vers Ianseo pour plus de détails](https://ianseo.net)
+> 🔗 [Visiter le site officiel d'Ianseo](https://ianseo.net)
 
 > Afin d'offrir une véritable alternative moderne, performante et ergonomique, j'ai initié le projet **Archery Nexus** :  
-> 🔗 [GitHub — Archery Nexus Rust](https://github.com/Imerpg/archery-nexus-rust)
+> 🔗 [Projet GitHub — Archery Nexus (Rust)](https://github.com/Imerpg/archery-nexus-rust)
+>
+> _En attendant le développement d'Archery Nexus, ce dépôt vise à faciliter et améliorer la prise en main d'Ianseo._
 
 ---
 
 ## ⚙️ Variables d’environnement
 
-Copiez `.env-prod` en `.env` ou définissez ces variables dans votre environnement. Elles sont utilisées par `docker-compose` et le script de préparation (`entrypoint.sh`).
+Copiez `.env-prod` en `.env` ou définissez ces variables dans votre environnement. Elles sont utilisées par `docker-compose` et le script de préparation.
 
 | Variable              | Description                               | Exemple                     |
 | :-------------------- | :---------------------------------------- | :-------------------------- |
@@ -34,13 +49,6 @@ Copiez `.env-prod` en `.env` ou définissez ces variables dans votre environneme
 cp .env-prod .env # ou modifiez .env selon vos besoins
 docker compose up -d --build
 ```
-
-Une fois les conteneurs démarrés :
-
-- **Application** : `http://localhost:<WEB_PORT>/ianseo/`
-- **Page de débogage PHP** : `http://localhost:<WEB_PORT>/phpinfo.php`
-
-La base MySQL est initialisée automatiquement au premier démarrage.
 
 ---
 
