@@ -143,19 +143,18 @@ set_permissions()
 # ------------------------------------
 update_ianseo() {
     echo "==> Vérification de la base de données Ianseo..."
-
-    TABLE_EXISTS=$(mysql -h "${DB_HOST}" -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}" --skip-ssl "${MYSQL_DATABASE}" \
-        -e "SHOW TABLES LIKE 'Parameters';" 2>/dev/null | grep -c "Parameters") || TABLE_EXISTS=0
-
     # Importation du schéma SQL initial uniquement si la base est totalement vide
     if [ "${TABLE_EXISTS:-0}" -eq 0 ]; then
         echo "==> Importation du schéma SQL initial..."
         if [ -f "$INSTALL_DIR/Install/install.sql" ]; then
-            mysql -h "${DB_HOST}" -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}" --skip-ssl "${MYSQL_DATABASE}" \
-                < "$INSTALL_DIR/Install/install.sql"
-            echo "==> Importation SQL terminée."
+            if ! mysql -h "${DB_HOST}" -u "${MYSQL_USER}" -p"${MYSQL_PASSWORD}" --skip-ssl "${MYSQL_DATABASE}" \
+                < "$INSTALL_DIR/Install/install.sql"; then
+                echo "ERREUR : Échec lors de l'importation du fichier install.sql dans la base de données." >&2
+                exit 1
+            fi
+            echo "==> Importation SQL terminée avec succès."
         else
-            echo "ERREUR : Fichier install.sql introuvable dans $INSTALL_DIR/Install/"
+            echo "ERREUR : Fichier install.sql introuvable dans $INSTALL_DIR/Install/" >&2
             exit 1
         fi
     else
