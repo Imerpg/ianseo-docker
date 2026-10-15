@@ -118,9 +118,21 @@ ianseo_tweaks()
 # ------------------------------------
 set_permissions()
 {
-    echo "Ajustement des permissions et des propriétaires."
-    chown -R www-data:www-data "$INSTALL_DIR"
-    chmod -R u+wX "$INSTALL_DIR"
+    echo "Ajustement des permissions et des propriétaires..."
+
+    # Vérifie l'attribution du propriétaire pour www-data
+    if ! chown -R www-data:www-data "$INSTALL_DIR"; then
+        echo "ERREUR : Échec de la modification du propriétaire pour www-data sur ${INSTALL_DIR}." >&2
+        exit 1
+    fi
+
+    # Vérifie l'application des permissions d'écriture
+    if ! chmod -R u+wX "$INSTALL_DIR"; then
+        echo "ERREUR : Échec de l'application des permissions sur ${INSTALL_DIR}." >&2
+        exit 1
+    fi
+
+    echo "Permissions et propriétaires ajustés avec succès."
 }
 # ------------------------------------
 
