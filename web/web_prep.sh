@@ -3,20 +3,34 @@
 # Stop script on any error
 set -e
 
+# ------------------------------------
 # Variables
-IANSEO_VERSION="${IANSEO_VERSION:-latest}" # Valeur par défaut si non définie
+# ------------------------------------
+IANSEO_VERSION="${IANSEO_VERSION}"
 IANSEO_ZIP="/tmp/Ianseo_${IANSEO_VERSION}.zip"
 INSTALL_DIR="/var/www/html/ianseo"
 INDEX_PHP="$INSTALL_DIR/Install/index.php"
 CONFIG_FILE="$INSTALL_DIR/Common/config.inc.php"
 DB_HOST="${DB_HOST:-ianseo-install-db-1}"
+# ------------------------------------
 
+
+
+# -------------------------------------
+# Prepare le répértoire d'installation
+# -------------------------------------
 directory_prep()
 {
     echo "Préparation du répertoire d'installation..."
     mkdir -p "$INSTALL_DIR"
 }
+# ------------------------------------
 
+
+
+# ------------------------------------
+# Télécharge Ianseo daté de la date indiqué dans .env
+# ------------------------------------
 download_ianseo()
 {
     if [ ! -f "$IANSEO_ZIP" ]; then
@@ -25,7 +39,13 @@ download_ianseo()
         echo "Téléchargement terminé."
     fi
 }
+# ------------------------------------
 
+
+
+# ------------------------------------
+# Extration du zip
+# ------------------------------------
 extract_ianseo_zip()
 {
     # On vérifie si index.php n'existe pas déjà pour éviter de réextraire à chaque redémarrage
@@ -36,7 +56,13 @@ extract_ianseo_zip()
         echo "fait."
     fi
 }
+# ------------------------------------
 
+
+
+# ------------------------------------
+# Ianseo tweaks
+# ------------------------------------
 ianseo_tweaks()
 {
     # Configure l'hôte de base de données dans index.php si besoin
@@ -55,14 +81,26 @@ ianseo_tweaks()
         fi
     fi
 }
+# ------------------------------------
 
+
+
+# ------------------------------------
+# Définie les premision (voir instalation Ianseo)
+# ------------------------------------
 set_permissions()
 {
     echo "Ajustement des permissions et des propriétaires."
     chown -R www-data:www-data "$INSTALL_DIR"
     chmod -R u+wX "$INSTALL_DIR"
 }
+# ------------------------------------
 
+
+
+# ------------------------------------
+# Met a jour et installe ianseo (même l'installation web !)
+# ------------------------------------
 update_ianseo() {
     echo "==> Vérification de la base de données Ianseo..."
 
@@ -84,7 +122,13 @@ update_ianseo() {
         echo "==> La base de données est déjà initialisée, importation ignorée."
     fi
 }
+# ------------------------------------
 
+
+
+# ------------------------------------
+# Génére la configuration de Ianseo (bypass l'installation manuelle)
+# ------------------------------------
 generate_config()
 {
     # 1. Créer le fichier config.php à la racine d'Ianseo (celui qui lève les erreurs Undefined property)
@@ -140,8 +184,13 @@ EOF
         echo "Fichiers de configuration créés avec succès."
     fi
 }
+# ------------------------------------
 
 
+
+# ------------------------------------
+# Script pricipal
+# ------------------------------------
 echo "web_prep script starting:"
 directory_prep
 download_ianseo
@@ -149,7 +198,7 @@ extract_ianseo_zip
 ianseo_tweaks
 set_permissions
 update_ianseo
-generate_config   # <-- C'EST CET APPEL QUI MANQUAIT !
+generate_config
 
 # Préparation du debug (si le fichier existe dans /tmp)
 if [ -f /tmp/phpinfo.php ]; then
@@ -164,3 +213,5 @@ echo "web_prep script completed."
 
 echo "Lancement de l'application ...."
 exec apache2-foreground
+
+# ------------------------------------
