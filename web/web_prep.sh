@@ -35,8 +35,20 @@ download_ianseo()
 {
     if [ ! -f "$IANSEO_ZIP" ]; then
         echo "Téléchargement d'Ianseo version ${IANSEO_VERSION} depuis le site officiel..."
-        curl -fL "https://ianseo.net/Release/Ianseo_${IANSEO_VERSION}.zip" -o "$IANSEO_ZIP"
-        echo "Téléchargement terminé."
+
+        # curl -f permet de renvoyer une erreur HTTP (ex: 404 ou 500) au lieu de télécharger une page d'erreur vide
+        if ! curl -fL "https://ianseo.net/Release/Ianseo_${IANSEO_VERSION}.zip" -o "$IANSEO_ZIP"; then
+            echo "ERREUR : Échec du téléchargement du fichier ZIP d'Ianseo." >&2
+            exit 1
+        fi
+
+        # Vérification supplémentaire : s'assurer que le fichier téléchargé n'est pas vide
+        if [ ! -s "$IANSEO_ZIP" ]; then
+            echo "ERREUR : Le fichier téléchargé est vide ou corrompu." >&2
+            exit 1
+        fi
+
+        echo "Téléchargement terminé avec succès."
     fi
 }
 # ------------------------------------
