@@ -11,7 +11,8 @@ services:
         volumes:
             - web_volume:/var/www/html/
         depends_on:
-            - db
+            db:
+                condition: service_healthy
         networks:
             default:
                 aliases:
@@ -31,6 +32,11 @@ services:
             default:
                 aliases:
                     - ianseo_docker_db
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}"]
+            interval: 5s
+            timeout: 3s
+            retries: 5
 
 volumes:
     db_volume:
