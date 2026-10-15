@@ -60,10 +60,15 @@ download_ianseo()
 # ------------------------------------
 extract_ianseo_zip()
 {
-    # On vérifie si index.php n'existe pas déjà pour éviter de réextraire à chaque redémarrage
     if [ ! -f "$INSTALL_DIR/index.php" ]; then
         echo -n "Extraction du fichier $IANSEO_ZIP... "
-        unzip -q "$IANSEO_ZIP" -d "$INSTALL_DIR"
+
+        # Vérifie si l'extraction s'effectue correctement
+        if ! unzip -q "$IANSEO_ZIP" -d "$INSTALL_DIR"; then
+            echo "ERREUR : Échec de l'extraction du fichier ZIP d'Ianseo." >&2
+            exit 1
+        fi
+
         rm -f "$IANSEO_ZIP"
         echo "fait."
     fi
