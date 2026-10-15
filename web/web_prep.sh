@@ -82,19 +82,30 @@ extract_ianseo_zip()
 # ------------------------------------
 ianseo_tweaks()
 {
-    # Configure l'hôte de base de données dans index.php si besoin
+    # Configure l'hôte de base de données dans index.php
     if [ -f "$INDEX_PHP" ]; then
-        echo "Modification de ${INDEX_PHP}"
-        sed -i.orig "s/W_HOST='localhost'/W_HOST='${DB_HOST}'/" "$INDEX_PHP"
+        echo "Modification de ${INDEX_PHP}..."
+        if ! sed -i.orig "s/W_HOST='localhost'/W_HOST='${DB_HOST}'/" "$INDEX_PHP"; then
+            echo "ERREUR : Impossible de modifier l'hôte de la base de données dans index.php." >&2
+            exit 1
+        fi
+        echo "Modification de l'index réussie."
+    else
+        echo "ERREUR : Le fichier ${INDEX_PHP} est introuvable." >&2
+        exit 1
     fi
 
-    # Fix a known typo in UpdateDb.inc.php si le fichier correspond au checksum
+    # Correction d'un bug connu (typo) dans UpdateDb.inc.php si le fichier correspond au checksum
     UPDATE_DB_FILE="$INSTALL_DIR/Common/UpdateDb.inc.php"
     if [ -f "$UPDATE_DB_FILE" ]; then
         UPDATE_DB_MD5SUM=$(md5sum "$UPDATE_DB_FILE" | awk '{ print $1 }')
         if [ "$UPDATE_DB_MD5SUM" = "9b97ce0acf64cdd6df6dadfd5e72bead" ]; then
-            echo "Correction du bug dans UpdateDb.inc.php."
-            sed -i 's/if($u=safe_fetch($q))/if($u=safe_fetch($t))/' "$UPDATE_DB_FILE"
+            echo "Correction du bug dans UpdateDb.inc.php..."
+            if ! sed -i 's/if($u=safe_fetch($q))/if($u=safe_fetch($t))/' "$UPDATE_DB_FILE"; then
+                echo "ERREUR : Échec de l'application du correctif sur UpdateDb.inc.php." >&2
+                exit 1
+            fi
+            echo "Correctif appliqué avec succès."
         fi
     fi
 }

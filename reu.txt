@@ -1,0 +1,3 @@
+## Reu 11/10/2026
+
+- Bug sur l'importatition Voirs la table
