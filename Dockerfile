@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     # Basic tools
     unzip \
     curl \
+    jq \
     dos2unix \
     # client MySQL for command line
     default-mysql-client \
