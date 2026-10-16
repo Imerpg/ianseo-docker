@@ -7,7 +7,7 @@
 
 ## 📋 Prochaines évolutions (Roadmap)
 
-- [ ] Mettre à jour Ianseo automatiquement dès le lancement pour éviter de devoir cliquer sur _"Mettre à jour Ianseo"_ dans les modules.
+- [x] Mettre à jour Ianseo automatiquement dès le lancement pour éviter de devoir cliquer sur _"Mettre à jour Ianseo"_ dans les modules.
 - [ ] Ajouter un tutoriel d'installation de Docker depuis le site officiel.
 - [ ] Créer un script d'automatisation pour lancer `docker compose` en une seule commande.
 
