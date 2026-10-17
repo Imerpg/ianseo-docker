@@ -51,6 +51,7 @@ COPY web/phpinfo.php /tmp
 
     
 COPY web/web_prep.sh /usr/local/bin/web_prep.sh
+RUN dos2unix /usr/local/bin/web_prep.sh && chmod +x /usr/local/bin/web_prep.sh
 RUN chmod +x /usr/local/bin/web_prep.sh
 
 ENTRYPOINT ["/usr/local/bin/web_prep.sh"]
