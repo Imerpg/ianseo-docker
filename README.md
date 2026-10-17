@@ -7,7 +7,7 @@
 
 ## 📋 Prochaines évolutions (Roadmap)
 
-- [x] Mettre à jour Ianseo automatiquement dès le lancement pour éviter de devoir cliquer sur _"Mettre à jour Ianseo"_ dans les modules.
+- [x] Automatiser le lancement de la mise à jour Ianseo (`getFile` → `doUpdate` → suivi de progression via `getInfo`), sans passer par l'interface web des modules.
 - [ ] Ajouter un tutoriel d'installation de Docker depuis le site officiel.
 - [ ] Créer un script d'automatisation pour lancer `docker compose` en une seule commande.
 
@@ -38,6 +38,9 @@ Copiez `.env-prod` en `.env` ou définissez ces variables dans votre environneme
 | `MYSQL_DATABASE`      | Nom de la base créée                      | `ianseo`                    |
 | `MYSQL_USER`          | Utilisateur MySQL pour Ianseo             | `ianseo`                    |
 | `MYSQL_PASSWORD`      | Mot de passe de l’utilisateur ianseo      | _votre_mot_de_passe_        |
+| `DB_HOST`             | Hôte de la base de données                | `ianseo-install-db-1`       |
+| `IANSEO_UPDATE_USER`  | (Optionnel) Utilisateur pour la mise à jour automatique autre que PRODUCTION | —              |
+| `IANSEO_UPDATE_PASS`  | (Optionnel) Mot de passe pour la mise à jour automatique autre que PRODUCTION | —             |
 
 > 📝 **Sécurité** : Changez impérativement les identifiants MySQL avant toute utilisation en production.
 
@@ -54,24 +57,24 @@ docker compose up -d --build
 
 ## 🔄 Fonctionnement de l'installation automatisée
 
-Le conteneur Web utilise un script d'entrée (`web/entrypoint.sh`) qui automatise l'intégralité du déploiement.
+Le conteneur Web utilise un script d'entrée (`web/web_prep.sh`) qui automatise l'intégralité du déploiement.
 
 1. **Téléchargement & extraction**
    Télécharge automatiquement la version d'Ianseo spécifiée par `IANSEO_VERSION` depuis les serveurs officiels et l'extrait dans :
    `/var/www/html/ianseo/`
 
 2. **Attente de la base de données**
-   Boucle de vérification jusqu'à ce que le conteneur MySQL soit prêt à accepter des connexions.
+   Boucle de vérification (30 s max) jusqu'à ce que le conteneur MySQL soit prêt à accepter des connexions.
 
 3. **Configuration réseau & accès**
-   Génère automatiquement le fichier `Common/config.inc.php` avec les identifiants de la base de données et les paramètres de limites mémoire/temps d'exécution PHP requis.
+   Génère automatiquement les fichiers de configuration (`config.php`, `Common/config.inc.php`) avec les identifiants de la base de données et les paramètres de limites mémoire/temps d'exécution PHP requis.
 
 4. **Initialisation de la base**
    Détecte si la base de données est vierge et importe le schéma SQL initial :
    `Install/install.sql`
 
-5. **Mise à jour automatique du schéma PHP**
-   Exécute le script d'upgrade natif d'Ianseo (`Install/upgrade.php`) en ligne de commande pour aligner la base de données sur la version des fichiers de l'application. Cela évite le message d'avertissement de mise à jour manuelle au premier accès navigateur.
+5. **Mise à jour automatique d'Ianseo**
+   Une fois Apache démarré, le script interroge l'API interne de mise à jour d'Ianseo (`getFile` → `doUpdate`) et suit la progression via `getInfo`. En cas d'échec (par exemple session non authentifiée), le conteneur continue de fonctionner normalement et l'erreur est journalisée.
 
 6. **Droits d'accès**
    Réapplique les permissions `www-data` sur l'ensemble des fichiers avant d'exécuter Apache.
@@ -102,6 +105,10 @@ N'oubliez pas d'inclure le slash final dans l'URL :
 `http://localhost/ianseo/`  
 Sans ce slash, Apache peut tenter une redirection vers le port interne du conteneur selon votre configuration proxy/hôte.
 
+### ⚠️ Fins de ligne des scripts (Windows)
+
+Si vous éditez les scripts `.sh` depuis Windows, assureurez-vous qu'ils conservent des fins de ligne **LF** (et non CRLF), sans quoi le conteneur échouera au démarrage avec `exec: no such file or directory`. Le dépôt applique la normalisation via `.gitattributes`.
+
 ---
 
 ## 🛠️ Bonnes pratiques
@@ -130,7 +137,9 @@ Les volumes suivants conservent respectivement les fichiers de l'application et 
 
 ## 📄 Licence & crédits
 
-Ce projet fournit un installateur automatisé Docker pour Ianseo.
+Ce projet est distribué sous licence **GNU General Public License v3.0** — voir le fichier `LICENSE`.
 
-L’archive applicative est téléchargée directement depuis le site officiel :  
-[https://ianseo.net](https://ianseo.net)
+Il fournit un installateur automatisé Docker pour **Ianseo**, qu'il télécharge, déploie et met à jour depuis le site officiel :  
+🔗 [https://ianseo.net](https://ianseo.net)
+
+> **Ianseo** est un logiciel libre distribué sous licence **GNU GPLv3** par son équipe de développement et **World Archery Europe**. Ianseo et ses auteurs restent titulaires de l'ensemble des droits sur le logiciel original ; ce dépôt ne fait que l'installer et l'accompagner d'outils de déploiement. Il n'est ni affilié à, ni avalisé par Ianseo ou World Archery.
