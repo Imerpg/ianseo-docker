@@ -29,18 +29,22 @@ Tout fonctionne dans des conteneurs (comme des boîtes virtuelles) grâce à Doc
 Docker est obligatoire pour faire fonctionner cet installateur.
 
 #### Sur Windows 10/11
+
 1. Téléchargez Docker Desktop depuis : https://www.docker.com/products/docker-desktop/
 2. Installez-le en suivant les instructions (acceptez toutes les options par défaut)
 3. Redémarrez votre ordinateur après l'installation
 4. Lancez Docker Desktop (attendez qu'il soit Running)
 
 #### Sur macOS
+
 1. Téléchargez Docker Desktop depuis : https://www.docker.com/products/docker-desktop/
 2. Installez-le
 3. Lancez Docker Desktop
 
 #### Sur Linux (Ubuntu/Debian)
+
 Ouvrez un terminal et exécutez :
+
 ```sh
 sudo apt update && sudo apt install docker.io docker-compose -y
 sudo systemctl enable --now docker
@@ -48,9 +52,11 @@ sudo systemctl enable --now docker
 
 Pour vérifier que Docker est installé :
 Ouvrez un terminal et tapez :
+
 ```sh
 docker --version
 ```
+
 Si vous voyez Docker version 25.x.x, c'est bon.
 
 ---
@@ -67,6 +73,7 @@ cd ianseo-installer
 ```
 
 Si vous ne savez pas utiliser Git :
+
 - Téléchargez le projet en ZIP depuis GitHub
 - Décompressez-le dans un dossier de votre choix
 - Ouvrez un terminal dans ce dossier
@@ -76,11 +83,13 @@ Si vous ne savez pas utiliser Git :
 Le projet fonctionne aussi avec les paramètres par défaut. Pour les personnaliser :
 
 1. Copiez le fichier d'exemple :
+
 ```sh
 cp .env-prod .env
 ```
 
 2. Éditez le fichier .env avec un éditeur de texte :
+
 - IANSEO_VERSION : Version d'Ianseo à installer (format : AAAAMMJJ, ex. : 20250210)
 - WEB_PORT : Port pour accéder à Ianseo (par défaut : 80)
 - MYSQL_ROOT_PASSWORD : MOT DE PASSE pour la base de données (à changer impérativement !)
@@ -99,6 +108,7 @@ docker compose up -d --build
 ```
 
 Et voilà, Docker s'occupe du reste :
+
 1. Télécharger Ianseo automatiquement
 2. Installer la base de données MySQL
 3. Configurer tout automatiquement
@@ -137,16 +147,19 @@ Pour votre première connexion, utilisez les identifiants par défaut d'Ianseo :
 Pour installer une version précise d'Ianseo :
 
 1. Arrêtez les conteneurs :
+
 ```sh
 docker compose down
 ```
 
 2. Modifiez la version dans .env :
+
 ```env
 IANSEO_VERSION=20260315
 ```
 
 3. Redémarrez :
+
 ```sh
 docker compose up -d --build
 ```
@@ -156,37 +169,49 @@ docker compose up -d --build
 ## Questions fréquentes (FAQ)
 
 ### Q : Je vois une erreur « port already in use »
+
 R : Le port 80 est déjà utilisé. Changez le port dans .env :
+
 ```env
 WEB_PORT=8080
 ```
+
 Puis accédez à http://localhost:8080/ianseo/
 
 ### Q : Comment arrêter Ianseo ?
+
 R :
+
 ```sh
 docker compose down
 ```
 
 ### Q : Comment redémarrer Ianseo ?
+
 R :
+
 ```sh
 cd ianseo-installer
 docker compose up -d
 ```
 
 ### Q : Où sont stockées mes données ?
+
 R : Vos données sont sauvegardées dans des volumes Docker. Elles persistent même après avoir arrêté les conteneurs.
 
 ### Q : Comment tout réinitialiser ?
+
 R : ⚠️ **Attention : cette opération effacera toutes vos données.**
+
 ```sh
 docker compose down -v
 docker compose up -d --build
 ```
 
 ### Q : Je n'arrive pas à accéder à Ianseo
+
 R : Vérifiez que :
+
 1. Docker est bien lancé
 2. Vous avez attendu assez longtemps (au moins 2 minutes)
 3. Vous utilisez la bonne URL : http://localhost/ianseo/
@@ -196,19 +221,24 @@ R : Vérifiez que :
 ## Dépannage
 
 ### Docker n'est pas reconnu
+
 - Windows/macOS : Assurez-vous que Docker Desktop est lancé
 - Linux : Vérifiez que vous êtes dans le groupe docker :
+
 ```sh
 sudo usermod -aG docker $USER
 ```
+
 Puis redémarrez votre session.
 
 ### Le téléchargement est bloqué
+
 - Vérifiez votre connexion internet
 - Assurez-vous qu'aucune restriction ne bloque ianseo.net
 - Essayez une version plus ancienne dans .env
 
 ### Erreur de base de données
+
 - Vérifiez les mots de passe dans .env
 - Essayez : docker compose down -v && docker compose up -d --build
 
@@ -221,6 +251,7 @@ Puis redémarrez votre session.
 Ianseo est le logiciel open source de référence pour la gestion des compétitions de tir à l'arc, utilisé dans le monde entier et conforme aux réglementations de World Archery.
 
 Développé depuis 2000, Ianseo permet de :
+
 - Gérer les inscriptions des archers
 - Organiser les tours de compétition
 - Calculer les scores automatiquement
@@ -232,6 +263,7 @@ Site officiel : https://ianseo.net
 ### Pourquoi cet installateur ?
 
 L'installation manuelle d'Ianseo peut être complexe :
+
 - Nécessite un serveur web (Apache/Nginx)
 - Nécessite une base de données MySQL
 - Configuration PHP spécifique
