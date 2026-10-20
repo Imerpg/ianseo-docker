@@ -1,145 +1,233 @@
-# 🎯 Ianseo-Install
+# Ianseo-Install - Installateur Docker pour Ianseo
 
-> **Déploiement simple, rapide et 100 % Dockerisé d'Ianseo.**  
-> Conservez un ordinateur hôte propre sans dépendances locales à installer.
+> **Une solution clé en main pour déployer Ianseo en 3 étapes, même si vous ne connaissez rien à l'informatique !**
 
----
+Ianseo-Install est un outil qui installe automatiquement **Ianseo** (le logiciel de gestion de compétitions de tir à l'arc le plus utilisé au monde) sur votre ordinateur, **sans avoir à configurer quoi que ce soit manuellement**.
 
-## 📋 Prochaines évolutions (Roadmap)
-
-- [x] Automatiser le lancement de la mise à jour Ianseo (`getFile` → `doUpdate` → suivi de progression via `getInfo`), sans passer par l'interface web des modules.
-- [ ] Ajouter un tutoriel d'installation de Docker depuis le site officiel.
-- [ ] Créer un script d'automatisation pour lancer `docker compose` en une seule commande.
+Tout fonctionne dans des conteneurs (comme des boîtes virtuelles) grâce à Docker, ce qui garantit que votre ordinateur reste propre et que tout fonctionne du premier coup.
 
 ---
 
-## ℹ️ À propos d'Ianseo & d'Archery Nexus
+## Table des matières
 
-> **Ianseo** est la solution _open source_ de référence pour la gestion des compétitions de tir à l'arc, en conformité avec les règlements de la **World Archery**. Bien qu'il demeure le logiciel le plus employé à l'échelle mondiale, sa conception datant de 2000 (en PHP et JavaScript natifs) le rend aujourd'hui obsolète sur les plans de l'UI/UX et des performances. Son manque d'ergonomie et sa prise en main laborieuse sont aujourd'hui largement décriés.
->
-> 🔗 [Visiter le site officiel d'Ianseo](https://ianseo.net)
-
-> Afin d'offrir une véritable alternative moderne, performante et ergonomique, j'ai initié le projet **Archery Nexus** :  
-> 🔗 [Projet GitHub — Archery Nexus (Rust)](https://github.com/Imerpg/archery-nexus-rust)
->
-> _En attendant le développement d'Archery Nexus, ce dépôt vise à faciliter et améliorer la prise en main d'Ianseo._
-
----
-
-## ⚙️ Variables d’environnement
-
-Copiez `.env-prod` en `.env` ou définissez ces variables dans votre environnement. Elles sont utilisées par `docker-compose` et le script de préparation.
-
-| Variable              | Description                               | Exemple                     |
-| :-------------------- | :---------------------------------------- | :-------------------------- |
-| `IANSEO_VERSION`      | Version d’Ianseo à télécharger (AAAAMMJJ) | `20250210`                  |
-| `WEB_PORT`            | Port hôte mappé vers le conteneur Apache  | `80`                        |
-| `MYSQL_ROOT_PASSWORD` | Mot de passe du compte root MySQL         | `very_secure_root_password` |
-| `MYSQL_DATABASE`      | Nom de la base créée                      | `ianseo`                    |
-| `MYSQL_USER`          | Utilisateur MySQL pour Ianseo             | `ianseo`                    |
-| `MYSQL_PASSWORD`      | Mot de passe de l’utilisateur ianseo      | _votre_mot_de_passe_        |
-| `DB_HOST`             | Hôte de la base de données                | `ianseo-install-db-1`       |
-| `IANSEO_UPDATE_USER`  | (Optionnel) Utilisateur pour la mise à jour automatique autre que PRODUCTION | —              |
-| `IANSEO_UPDATE_PASS`  | (Optionnel) Mot de passe pour la mise à jour automatique autre que PRODUCTION | —             |
-
-> 📝 **Sécurité** : Changez impérativement les identifiants MySQL avant toute utilisation en production.
+- [Prerequis](#prerequis)
+- [Installation rapide (3 étapes)](#installation-rapide)
+- [Première utilisation](#première-utilisation)
+- [Questions fréquentes (FAQ)](#questions-fréquentes)
+- [Dépannage](#dépannage)
+- [A propos d-Ianseo](#à-propos-dianseo)
+- [Licence](#licence)
 
 ---
 
-## 🚀 Démarrage
+## Prerequis
 
-```bash
-cp .env-prod .env # ou modifiez .env selon vos besoins
+### 1. Installer Docker
+
+Docker est obligatoire pour faire fonctionner cet installateur.
+
+#### Sur Windows 10/11
+1. Téléchargez Docker Desktop depuis : https://www.docker.com/products/docker-desktop/
+2. Installez-le en suivant les instructions (acceptez toutes les options par défaut)
+3. Redémarrez votre ordinateur après l-installation
+4. Lancez Docker Desktop (attendez qu-il soit Running)
+
+#### Sur macOS
+1. Téléchargez Docker Desktop depuis : https://www.docker.com/products/docker-desktop/
+2. Installez-le
+3. Lancez Docker Desktop
+
+#### Sur Linux (Ubuntu/Debian)
+Ouvrez un terminal et exécutez:
+sudo apt update && sudo apt install docker.io docker-compose -y
+sudo systemctl enable --now docker
+
+Pour vérifier que Docker est installé:
+Ouvrez un terminal et tapez:
+docker --version
+Si vous voyez Docker version 25.x.x, c'est bon.
+
+---
+
+## Installation rapide (3 étapes)
+
+### Etape 1: Télécharger le projet
+
+Ouvrez un terminal et exécutez:
+
+git clone https://github.com/Imerpg/ianseo-installer.git ianseo-installer
+cd ianseo-installer
+
+Si vous ne savez pas utiliser git:
+- Téléchargez le projet en ZIP depuis GitHub
+- Décompressez-le dans un dossier de votre choix
+- Ouvrez un terminal dans ce dossier
+
+### Etape 2: Configurer (facultatif)
+
+Le projet fonctionne avec des paramètres par défaut.
+
+1. Copiez le fichier d-exemple:
+cp .env-prod .env
+
+2. Editez le fichier .env avec un éditeur de texte:
+- IANSEO_VERSION: Version d-Ianseo à installer (format: AAAAMMJJ, ex: 20250210)
+- WEB_PORT: Port pour accéder à Ianseo (par défaut: 80)
+- MYSQL_ROOT_PASSWORD: MOT DE PASSE pour la base de données (à changer impérativement!)
+- MYSQL_DATABASE: Nom de la base de données (par défaut: ianseo)
+- MYSQL_USER: Utilisateur de la base de données (par défaut: ianseo)
+- MYSQL_PASSWORD: Mot de passe de l-utilisateur (par défaut: ianseo)
+
+IMPORTANT: Changez MYSQL_ROOT_PASSWORD et MYSQL_PASSWORD par des mots de passe FORTS et DIFFERENTS avant de démarrer.
+
+### Etape 3: Démarrer Ianseo
+
+Dans le terminal, exécutez:
+
 docker compose up -d --build
-```
+
+Le système va:
+1. Télécharger Ianseo automatiquement
+2. Installer la base de données MySQL
+3. Configurer tout automatiquement
+4. Démarrer l-application
+5. Mettre à jour Ianseo automatiquement (si une nouvelle version est disponible)
+
+Durée estimée: Entre 30 secondes et 2 minutes (inclut la mise à jour automatique).
+n
+> ✅ **Mise à jour automatique incluse** : Aucune action nécessaire de votre part. Le système vérifie et installe automatiquement la dernière version d-Ianseo à chaque démarrage.
 
 ---
 
-## 🔄 Fonctionnement de l'installation automatisée
+## Première utilisation
 
-Le conteneur Web utilise un script d'entrée (`web/web_prep.sh`) qui automatise l'intégralité du déploiement.
+### Accéder à Ianseo
 
-1. **Téléchargement & extraction**
-   Télécharge automatiquement la version d'Ianseo spécifiée par `IANSEO_VERSION` depuis les serveurs officiels et l'extrait dans :
-   `/var/www/html/ianseo/`
+Une fois l-installation terminée:
 
-2. **Attente de la base de données**
-   Boucle de vérification (30 s max) jusqu'à ce que le conteneur MySQL soit prêt à accepter des connexions.
+1. Ouvrez votre navigateur (Chrome, Firefox, Edge, etc.)
+2. Allez à l-adresse: http://localhost/ianseo/
 
-3. **Configuration réseau & accès**
-   Génère automatiquement les fichiers de configuration (`config.php`, `Common/config.inc.php`) avec les identifiants de la base de données et les paramètres de limites mémoire/temps d'exécution PHP requis.
+Attention: N-oubliez pas le / à la fin de l-URL.
 
-4. **Initialisation de la base**
-   Détecte si la base de données est vierge et importe le schéma SQL initial :
-   `Install/install.sql`
+3. Vous devriez voir l-interface d-Ianseo
 
-5. **Mise à jour automatique d'Ianseo**
-   Une fois Apache démarré, le script interroge l'API interne de mise à jour d'Ianseo (`getFile` → `doUpdate`) et suit la progression via `getInfo`. En cas d'échec (par exemple session non authentifiée), le conteneur continue de fonctionner normalement et l'erreur est journalisée.
+### Identifiants de connexion
 
-6. **Droits d'accès**
-   Réapplique les permissions `www-data` sur l'ensemble des fichiers avant d'exécuter Apache.
+Par défaut, Ianseo utilise:
+- Utilisateur: admin
+- Mot de passe: admin
+
+(Ces identifiants sont ceux d-Ianseo par défaut, pas ceux de la base de données)
 
 ---
 
-## ⚠️ Warnings & Mises en garde
+## Mise à jour
 
-### ⚠️ Premier démarrage & volumes persistants
+Pour mettre à jour Ianseo:
 
-Si vous modifiez les scripts d'initialisation SQL ou la version d'Ianseo après un premier lancement, les modifications ne seront pas réappliquées automatiquement sur une base déjà créée.
+1. Arrêtez les conteneurs:
+docker compose down
 
-Pour réinitialiser complètement l'environnement et relancer la procédure d'installation automatique, supprimez les volumes associés :
+2. Modifiez la version dans .env:
+IANSEO_VERSION=20260315
 
-```bash
+3. Redémarrez:
+docker compose up -d --build
+
+---
+
+## Questions fréquentes (FAQ)
+
+### Q: Je vois une erreur port already in use
+R: Le port 80 est déjà utilisé. Changez le port dans .env:
+WEB_PORT=8080
+Puis accédez à http://localhost:8080/ianseo/
+
+### Q: Comment arrêter Ianseo?
+R: docker compose down
+
+### Q: Comment redémarrer Ianseo?
+R:
+cd ianseo-installer
+docker compose up -d
+
+### Q: Où sont stockées mes données?
+R: Vos données sont sauvegardées dans des volumes Docker. Elles persistent même après avoir arrêté les conteneurs.
+
+### Q: Comment tout réinitialiser?
+R: ATTENTION, cela effacera toutes vos données:
 docker compose down -v
-docker compose up --build -d
-```
+docker compose up -d --build
 
-### ⚠️ Temps d'attente au premier lancement
-
-Lors du premier démarrage, l'initialisation de MySQL et le téléchargement/décompression de l'archive Ianseo (environ 65 Mo) peuvent prendre entre **15 et 45 secondes** selon votre connexion réseau et vos performances disque.  
-_Ne coupez pas le conteneur pendant cette étape._
-
-### ⚠️ Nom de domaine / port dans l'URL
-
-N'oubliez pas d'inclure le slash final dans l'URL :
-`http://localhost/ianseo/`  
-Sans ce slash, Apache peut tenter une redirection vers le port interne du conteneur selon votre configuration proxy/hôte.
-
-### ⚠️ Fins de ligne des scripts (Windows)
-
-Si vous éditez les scripts `.sh` depuis Windows, assureurez-vous qu'ils conservent des fins de ligne **LF** (et non CRLF), sans quoi le conteneur échouera au démarrage avec `exec: no such file or directory`. Le dépôt applique la normalisation via `.gitattributes`.
+### Q: Je n-arrive pas à accéder à Ianseo
+R: Vérifiez que:
+1. Docker est bien lancé
+2. Vous avez attendu assez longtemps (au moins 2 minutes)
+3. Vous utilisez la bonne URL: http://localhost/ianseo/
 
 ---
 
-## 🛠️ Bonnes pratiques
+## Dépannage
 
-- N’incluez pas l’archive ZIP d’Ianseo dans l’image Docker : elle est récupérée à la volée et supprimée immédiatement après extraction.
+### Docker n-est pas reconnu
+- Windows/macOS: Assurez-vous que Docker Desktop est lancé
+- Linux: Vérifiez que vous êtes dans le groupe docker:
+sudo usermod -aG docker $USER
+Puis redémarrez votre session.
 
-### Déboguer ou inspecter les conteneurs
+### Le téléchargement bloque
+- Vérifiez votre connexion internet
+- Assurez-vous qu-aucune restriction ne bloque ianseo.net
+- Essayez une version plus ancienne dans .env
 
-- **Conteneur Web** :
-    ```bash
-    docker exec -it ianseo-install-web-1 bash
-    ```
-- **Conteneur MySQL** :
-    ```bash
-    docker exec -it ianseo-install-db-1 bash
-    ```
-
-### Volumes persistants
-
-Les volumes suivants conservent respectivement les fichiers de l'application et les tables MySQL :
-
-- `web_volume` — Fichiers de l'application
-- `db_volume` — Tables MySQL
+### Erreur de base de données
+- Vérifiez les mots de passe dans .env
+- Essayez: docker compose down -v && docker compose up -d --build
 
 ---
 
-## 📄 Licence & crédits
+## A propos d-Ianseo
 
-Ce projet est distribué sous licence **GNU General Public License v3.0** — voir le fichier `LICENSE`.
+### Qu-est-ce qu-Ianseo?
 
-Il fournit un installateur automatisé Docker pour **Ianseo**, qu'il télécharge, déploie et met à jour depuis le site officiel :  
-🔗 [https://ianseo.net](https://ianseo.net)
+Ianseo est le logiciel open source de référence pour la gestion des compétitions de tir à l-arc, utilisé dans le monde entier et conforme aux réglementations de World Archery.
 
-> **Ianseo** est un logiciel libre distribué sous licence **GNU GPLv3** par son équipe de développement et **World Archery Europe**. Ianseo et ses auteurs restent titulaires de l'ensemble des droits sur le logiciel original ; ce dépôt ne fait que l'installer et l'accompagner d'outils de déploiement. Il n'est ni affilié à, ni avalisé par Ianseo ou World Archery.
+Développé depuis 2000, Ianseo permet de:
+- Gérer les inscriptions des archers
+- Organiser les tours de compétition
+- Calculer les scores automatiquement
+- Générer des classements et rapports
+- Respecter les règles officielles de World Archery
+
+Site officiel: https://ianseo.net
+
+### Pourquoi cet installateur?
+
+L-installation manuelle d-Ianseo peut être complexe:
+- Nécessite un serveur web (Apache/Nginx)
+- Nécessite une base de données MySQL
+- Configuration PHP spécifique
+- Gestion des permissions
+
+Notre solution: Tout est automatisé dans Docker.
+
+### Et Archery Nexus?
+
+Archery Nexus est un nouveau projet (en développement) qui vise à remplacer Ianseo par une solution moderne.
+Projet GitHub: https://github.com/Imerpg/archery-nexus-rust
+
+---
+
+## Licence
+
+Ce projet est open source sous licence GNU GPL v3.0.
+Voir le fichier LICENSE pour les détails.
+
+### Crédits
+
+- Ianseo: Développé par l-equipe d-Ianseo et World Archery Europe
+- Archery Nexus: Projet de modernisation en cours
+- Cet installateur: Développé pour simplifier l-installation d-Ianseo
+
+Important: Cet installateur n-est pas affilié à Ianseo ou World Archery.
