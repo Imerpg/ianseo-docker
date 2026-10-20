@@ -28,6 +28,12 @@ notify()
 #  Variables
 # ------------------------------------------------------------
 : "${IANSEO_VERSION:?IANSEO_VERSION must be set}"
+
+# Validate IANSEO_VERSION format (YYYYMMDD)
+if ! [[ "$IANSEO_VERSION" =~ ^[0-9]{8}$ ]]; then
+    notify "ERROR" "validation" "IANSEO_VERSION must be in YYYYMMDD format (e.g., 20250210)"
+    exit 1
+fi
 : "${MYSQL_USER:?MYSQL_USER must be set}"
 : "${MYSQL_PASSWORD:?MYSQL_PASSWORD must be set}"
 : "${MYSQL_DATABASE:?MYSQL_DATABASE must be set}"
