@@ -1,24 +1,29 @@
-# Ianseo-Install - Installateur Docker pour Ianseo
+<p align="center">
+  <img src="assets/logo.svg" width="400" alt="logo">
+</p>
 
-> **Une solution clé en main pour déployer Ianseo en 3 étapes, même si vous ne connaissez rien à l'informatique !**
+# Ianseo Docker
 
-Ianseo-Install est un outil qui installe automatiquement **Ianseo** (le logiciel de gestion de compétitions de tir à l'arc le plus utilisé au monde) sur votre ordinateur, **sans avoir à configurer quoi que ce soit manuellement**.
+> **Une solution clé en main pour déployer Ianseo en 3 étapes, même sans compétences en informatique !**
 
-Tout fonctionne dans des conteneurs (comme des boîtes virtuelles) grâce à Docker, ce qui garantit que votre ordinateur reste propre et que tout fonctionne du premier coup.
+Ianseo Docker est un outil qui installe automatiquement **Ianseo** (le logiciel de référence pour la gestion de compétitions de tir à l'arc) sur votre ordinateur, **sans aucune configuration manuelle**.
 
-> **En bref :** Docker s'occupe de l'installation, et Ianseo est prêt à être utilisé en quelques minutes.
+Tout fonctionne dans des conteneurs (des environnements isolés) grâce à Docker, ce qui garantit que votre ordinateur reste propre et que l'application fonctionne du premier coup.
+
+> **En bref :** Docker s'occupe de l'installation, et Ianseo est prêt à l'emploi en quelques minutes.
 
 ---
 
 ## Table des matières
 
 - [Prérequis](#prérequis)
-- [Installation rapide (3 étapes)](#installation-rapide)
+- [Installation rapide (3 étapes)](#installation-rapide-3-étapes)    
 - [Première utilisation](#première-utilisation)
-- [Questions fréquentes (FAQ)](#questions-fréquentes)
+- [Mise à jour](#mise-à-jour)
+- [Questions fréquentes (FAQ)](#questions-fréquentes-faq)
 - [Dépannage](#dépannage)
 - [À propos d'Ianseo](#à-propos-dianseo)
-- [Licence](#licence)
+- [Licence et crédits](#licence-et-crédits)
 
 ---
 
@@ -26,38 +31,34 @@ Tout fonctionne dans des conteneurs (comme des boîtes virtuelles) grâce à Doc
 
 ### 🐳 Installer Docker
 
-Docker est obligatoire pour faire fonctionner cet installateur.
+Docker est indispensable pour exécuter cet installateur.
 
 #### Sur Windows 10/11
 
-1. Téléchargez Docker Desktop depuis : https://www.docker.com/products/docker-desktop/
-2. Installez-le en suivant les instructions (acceptez toutes les options par défaut)
-3. Redémarrez votre ordinateur après l'installation
-4. Lancez Docker Desktop (attendez qu'il soit Running)
+1. Téléchargez Docker Desktop depuis le [site officiel de Docker](https://www.docker.com/products/docker-desktop/).
+2. Installez-le en suivant les instructions (conservez les options par défaut).
+3. Redémarrez votre ordinateur si nécessaire.
+4. Lancez Docker Desktop (attendez que le statut indique *Running*).
 
 #### Sur macOS
 
-1. Téléchargez Docker Desktop depuis : https://www.docker.com/products/docker-desktop/
-2. Installez-le
-3. Lancez Docker Desktop
+1. Téléchargez Docker Desktop depuis le [site officiel de Docker](https://www.docker.com/products/docker-desktop/).
+2. Installez l'application puis lancez-la.
 
 #### Sur Linux (Ubuntu/Debian)
 
 Ouvrez un terminal et exécutez :
 
 ```sh
-sudo apt update && sudo apt install docker.io docker-compose -y
+sudo apt update && sudo apt install docker.io docker-compose-v2 -y
 sudo systemctl enable --now docker
 ```
 
-Pour vérifier que Docker est installé :
-Ouvrez un terminal et tapez :
+Pour vérifier que Docker est correctement installé, tapez :
 
 ```sh
 docker --version
 ```
-
-Si vous voyez Docker version 25.x.x, c'est bon.
 
 ---
 
@@ -68,56 +69,54 @@ Si vous voyez Docker version 25.x.x, c'est bon.
 Ouvrez un terminal et exécutez :
 
 ```sh
-git clone https://github.com/Imerpg/ianseo-installer.git ianseo-installer
-cd ianseo-installer
+git clone https://github.com/Imerpg/ianseo-docker.git ianseo-docker
+cd ianseo-docker
 ```
 
-Si vous ne savez pas utiliser Git :
+*Si vous ne souhaitez pas utiliser Git :*
+- Téléchargez l'archive ZIP du projet depuis GitHub.
+- Décompressez-la dans le dossier de votre choix.
+- Ouvrez un terminal dans ce dossier.
 
-- Téléchargez le projet en ZIP depuis GitHub
-- Décompressez-le dans un dossier de votre choix
-- Ouvrez un terminal dans ce dossier
+<img src="assets/download-from-github.png" width="400" alt="download-from-github">
 
 ### 2️⃣ Configurer (facultatif)
 
-Le projet fonctionne aussi avec les paramètres par défaut. Pour les personnaliser :
+Le projet fonctionne directement avec les paramètres par défaut. Pour personnaliser la configuration :
 
-1. Copiez le fichier d'exemple :
+1. Dupliquez le fichier d'exemple :
 
 ```sh
 cp .env-prod .env
 ```
 
-2. Éditez le fichier .env avec un éditeur de texte :
+2. Éditez le fichier `.env` avec un éditeur de texte :
+   - `IANSEO_VERSION` : Version d'Ianseo à installer (format : `AAAAMMJJ`, ex. : `20250210`).
+   - `WEB_PORT` : Port d'accès web (par défaut : `80`).
+   - `MYSQL_ROOT_PASSWORD` : Mot de passe administrateur de la base de données.
+   - `MYSQL_DATABASE` : Nom de la base de données (par défaut : `ianseo`).
+   - `MYSQL_USER` : Nom d'utilisateur de la base de données (par défaut : `ianseo`).
+   - `MYSQL_PASSWORD` : Mot de passe utilisateur de la base de données.
 
-- IANSEO_VERSION : Version d'Ianseo à installer (format : AAAAMMJJ, ex. : 20250210)
-- WEB_PORT : Port pour accéder à Ianseo (par défaut : 80)
-- MYSQL_ROOT_PASSWORD : MOT DE PASSE pour la base de données (à changer impérativement !)
-- MYSQL_DATABASE : Nom de la base de données (par défaut : ianseo)
-- MYSQL_USER : Utilisateur de la base de données (par défaut : ianseo)
-- MYSQL_PASSWORD : Mot de passe de l'utilisateur (par défaut : ianseo)
-
-> 🔐 **À ne pas oublier :** remplacez `MYSQL_ROOT_PASSWORD` et `MYSQL_PASSWORD` par des mots de passe forts et différents avant de démarrer.
+> 🔐 **Sécurité :** Avant le premier démarrage, pensez à remplacer `MYSQL_ROOT_PASSWORD` et `MYSQL_PASSWORD` par des mots de passe forts.
 
 ### 3️⃣ Démarrer Ianseo
 
-Dans le terminal, exécutez :
+Dans le terminal, lancez (copier coller) :
 
 ```sh
 docker compose up -d --build
 ```
 
-Et voilà, Docker s'occupe du reste :
+Docker réalise automatiquement les opérations suivantes :
+1. Téléchargement des composants d'Ianseo.
+2. Initialisation de la base de données MySQL.
+3. Configuration automatique des services.
+4. Démarrage de l'application.
 
-1. Télécharger Ianseo automatiquement
-2. Installer la base de données MySQL
-3. Configurer tout automatiquement
-4. Démarrer l'application
-5. Mettre à jour Ianseo automatiquement (si une nouvelle version est disponible)
+*Durée estimée : entre 1 secondes et 5 minutes selon le pc.*
 
-Durée estimée : entre 30 secondes et 2 minutes (mise à jour automatique incluse).
-
-> ✅ **Mise à jour automatique incluse** : Aucune action n'est nécessaire de votre part. Le système vérifie et installe automatiquement la dernière version d'Ianseo à chaque démarrage.
+> ✅ **Mise à jour automatique :** Le système vérifie et applique automatiquement la dernière version d'Ianseo à chaque démarrage.
 
 ---
 
@@ -125,17 +124,17 @@ Durée estimée : entre 30 secondes et 2 minutes (mise à jour automatique inclu
 
 ### Accéder à Ianseo
 
-Une fois l'installation terminée, ouvrez votre navigateur et rendez-vous ici :
+Une fois le démarrage terminé, ouvrez votre navigateur web à l'adresse suivante :
 
-**http://localhost/ianseo/**
+**[http://localhost/ianseo/](http://localhost/ianseo/)**
 
-> 💡 N'oubliez pas le `/` à la fin de l'adresse.
+> 💡 *Note :* N'oubliez pas d'inclure le `/` final dans l'URL.
 
 ---
 
 ## Mise à jour
 
-Pour installer la nouvelle version d'Ianseo taper cette commande :
+Pour appliquer la dernière version d'Ianseo, exécutez la commande suivante (copier coller) :
 
 ```sh
 docker compose down && docker compose up -d --build
@@ -145,19 +144,19 @@ docker compose down && docker compose up -d --build
 
 ## Questions fréquentes (FAQ)
 
-### Q : Je vois une erreur « port already in use »
+### Q : Je reçois l'erreur « port already in use »
 
-R : Le port 80 est déjà utilisé. Changez le port dans .env :
+R : Le port `80` est déjà utilisé par une autre application. Modifiez la variable `WEB_PORT` dans le fichier `.env` :
 
 ```env
 WEB_PORT=8080
 ```
 
-Puis accédez à http://localhost:8080/ianseo/
+Accédez ensuite à l'application via : [http://localhost:8080/ianseo/](http://localhost:8080/ianseo/)
 
 ### Q : Comment arrêter Ianseo ?
 
-R :
+R : Dans le dossier du projet, exécutez (copier coller) :
 
 ```sh
 docker compose down
@@ -165,59 +164,47 @@ docker compose down
 
 ### Q : Comment redémarrer Ianseo ?
 
-R :
-
+R : 
+(copier coller)
 ```sh
-cd ianseo-installer
-docker compose down && docker compose up -d --build
+docker compose restart
 ```
+
+*(Ou `docker compose down && docker compose up -d --build` si vous souhaitez aussi reconstruire les conteneurs).*
 
 ### Q : Où sont stockées mes données ?
 
-R : Vos données sont sauvegardées dans des volumes Docker. Elles persistent même après avoir arrêté les conteneurs.
+R : Les données de la base de données et les fichiers sont enregistrés dans des volumes Docker persistants. Elles restent conservées même après l'arrêt des conteneurs.
 
-### Q : Comment tout réinitialiser ?
+### Q : Comment réinitialiser complètement l'installation ?
 
-R : ⚠️ **Attention : cette opération effacera toutes vos données.**
+R : ⚠️ **Attention : cette action supprime définitivement toutes vos données.**
 
 ```sh
 docker compose down -v
 docker compose up -d --build
 ```
 
-### Q : Je n'arrive pas à accéder à Ianseo
-
-R : Vérifiez que :
-
-1. Docker est bien lancé
-2. Vous avez attendu assez longtemps (au moins 2 minutes)
-3. Vous utilisez la bonne URL : http://localhost/ianseo/
-
 ---
 
 ## Dépannage
 
-### Docker n'est pas reconnu
+### Docker n'est pas reconnu ou ne répond pas
 
-- Windows/macOS : Assurez-vous que Docker Desktop est lancé
-- Linux : Vérifiez que vous êtes dans le groupe docker :
+- **Windows / macOS :** Vérifiez que Docker Desktop est bien lancé et actif.
+- **Linux :** Assurez-vous que votre utilisateur appartient au groupe `docker` :
 
 ```sh
 sudo usermod -aG docker $USER
 ```
 
-Puis redémarrez votre session.
+*Déconnectez-vous puis reconnectez-vous pour appliquer ce changement.*
 
-### Le téléchargement est bloqué
+### L'accès à `http://localhost/ianseo/` échoue
 
-- Vérifiez votre connexion internet
-- Assurez-vous qu'aucune restriction ne bloque ianseo.net
-- Essayez une version plus ancienne dans .env
-
-### Erreur de base de données
-
-- Vérifiez les mots de passe dans .env
-- Essayez : docker compose down -v && docker compose up -d --build
+1. Assurez-vous que le service Docker est en cours d'exécution.
+2. Patientez 1 à 2 minutes après le lancement initial.
+3. Vérifiez les journaux d'erreurs avec la commande : `docker compose logs -f`
 
 ---
 
@@ -225,45 +212,29 @@ Puis redémarrez votre session.
 
 ### Qu'est-ce qu'Ianseo ?
 
-Ianseo est le logiciel open source de référence pour la gestion des compétitions de tir à l'arc, utilisé dans le monde entier et conforme aux réglementations de World Archery.
+Ianseo est le logiciel open source de référence pour l'organisation et la gestion des compétitions de tir à l'arc. Utilisé à l'échelle internationale, il est conforme aux règlements officiels de World Archery.
 
-Développé depuis 2000, Ianseo permet de :
+Fonctionnalités principales :
+- Gestion des inscriptions et des tireurs
+- Planification des départs et cibles
+- Saisie et calcul automatique des scores
+- Édition des résultats, classements et feuilles de marque
 
-- Gérer les inscriptions des archers
-- Organiser les tours de compétition
-- Calculer les scores automatiquement
-- Générer des classements et rapports
-- Respecter les règles officielles de World Archery
+Site officiel : [ianseo.net](https://ianseo.net)
 
-Site officiel : https://ianseo.net
+### Pourquoi utiliser cette version Docker ?
 
-### Pourquoi cet installateur ?
-
-L'installation manuelle d'Ianseo peut être complexe :
-
-- Nécessite un serveur web (Apache/Nginx)
-- Nécessite une base de données MySQL
-- Configuration PHP spécifique
-- Gestion des permissions
-
-Notre solution : tout est automatisé dans Docker.
-
-### Et Archery Nexus?
-
-Archery Nexus est un nouveau projet (en développement) qui vise à remplacer Ianseo par une solution moderne.
-Projet GitHub : https://github.com/Imerpg/archery-nexus-rust
+L'installation classique d'Ianseo nécessite l'administration d'un serveur web (Apache/Nginx), la configuration d'une base de données MySQL et la gestion de modules PHP. Cet installateur encapsule l'ensemble de ces dépendances pour un déploiement immédiat.
 
 ---
 
-## Licence
+## Licence et crédits
 
-Ce projet est open source sous licence GNU GPL v3.0.
-Voir le fichier LICENSE pour les détails.
+Ce projet est distribué sous licence **GNU GPL v3.0**. Consultez le fichier `LICENSE` pour plus de détails.
 
 ### Crédits
 
-- Ianseo : Développé par l'équipe d'Ianseo et World Archery Europe
-- Archery Nexus : Projet de modernisation en cours
-- Cet installateur : Développé pour simplifier l'installation d'Ianseo
+- **Ianseo** : Développé par l'équipe Ianseo et soutenu par World Archery.
+- **Ianseo Docker** : Proposé par [Imerpg](https://github.com/Imerpg) pour simplifier le déploiement.
 
-Important : Cet installateur n'est affilié ni à Ianseo ni à World Archery.
+*Note : Ce projet est une initiative indépendante et n'est ni affilié ni officiel auprès de l'équipe Ianseo ou de World Archery.*
