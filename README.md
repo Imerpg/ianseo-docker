@@ -131,37 +131,14 @@ Une fois l'installation terminée, ouvrez votre navigateur et rendez-vous ici :
 
 > 💡 N'oubliez pas le `/` à la fin de l'adresse.
 
-### Identifiants de connexion
-
-Pour votre première connexion, utilisez les identifiants par défaut d'Ianseo :
-
-- Utilisateur : admin
-- Mot de passe : admin
-
-> Ces identifiants sont ceux d'Ianseo, pas ceux de la base de données.
-
 ---
 
 ## Mise à jour
 
-Pour installer une version précise d'Ianseo :
-
-1. Arrêtez les conteneurs :
+Pour installer la nouvelle version d'Ianseo taper cette commande :
 
 ```sh
-docker compose down
-```
-
-2. Modifiez la version dans .env :
-
-```env
-IANSEO_VERSION=20260315
-```
-
-3. Redémarrez :
-
-```sh
-docker compose up -d --build
+docker compose down && docker compose up -d --build
 ```
 
 ---
@@ -192,7 +169,7 @@ R :
 
 ```sh
 cd ianseo-installer
-docker compose up -d
+docker compose down && docker compose up -d --build
 ```
 
 ### Q : Où sont stockées mes données ?
