@@ -47,8 +47,8 @@ IANSEO_URL="${IANSEO_URL:-http://localhost/ianseo/Update/index-action.php}"
 IANSEO_UPDATE_USER="${IANSEO_UPDATE_USER:-}"
 IANSEO_UPDATE_PASS="${IANSEO_UPDATE_PASS:-}"
 
-IANSEO_MODULES="${IANSEO_MODULES:-all}"          # all | none | nom du module (ex: GUIDE)
-IANSEO_MODULES_LANG="${IANSEO_MODULES_LANG:-en}" # en | fr
+IANSEO_MODULES="${IANSEO_MODULES:-all}"
+IANSEO_MODULES_LANG="${IANSEO_MODULES_LANG:-en}"
 CUSTOM_DIR="$INSTALL_DIR/Modules/Custom"
 MODULES_INSTALL_URL="https://raw.githubusercontent.com/Steph-Krs/IanseoModules/main/install.sh"
 
