@@ -47,6 +47,11 @@ IANSEO_URL="${IANSEO_URL:-http://localhost/ianseo/Update/index-action.php}"
 IANSEO_UPDATE_USER="${IANSEO_UPDATE_USER:-}"
 IANSEO_UPDATE_PASS="${IANSEO_UPDATE_PASS:-}"
 
+IANSEO_MODULES="${IANSEO_MODULES:-all}"          # all | none | nom du module (ex: GUIDE)
+IANSEO_MODULES_LANG="${IANSEO_MODULES_LANG:-en}" # en | fr
+CUSTOM_DIR="$INSTALL_DIR/Modules/Custom"
+MODULES_INSTALL_URL="https://raw.githubusercontent.com/Steph-Krs/IanseoModules/main/install.sh"
+
 # ------------------------------------------------------------
 #  directory_prep
 # ------------------------------------------------------------
@@ -359,6 +364,55 @@ doUpdate()
     return 0
 }
 
+# ------------------------------------------------------------
+#  install_modules — install Steph-Krs/IanseoModules (Custom)
+#    - skipped if IANSEO_MODULES=none
+#    - skipped if already installed (_shared exists), so that
+#      updates made from the module admin page are not overwritten
+#    - non-fatal: a failure here must not block the container
+# ------------------------------------------------------------
+install_modules()
+{
+    if [ "$IANSEO_MODULES" = "none" ]; then
+        notify "INFO" "install_modules" "IANSEO_MODULES=none, skipping"
+        return 0
+    fi
+
+    if [ -d "$CUSTOM_DIR/_shared" ]; then
+        notify "OK" "install_modules" "modules already installed, skipping"
+        return 0
+    fi
+
+    command -v curl > /dev/null 2>&1 || { notify "WARN" "install_modules" "curl is not installed"; return 0; }
+    command -v tar  > /dev/null 2>&1 || { notify "WARN" "install_modules" "tar is not installed"; return 0; }
+
+    notify "INFO" "install_modules" "installing modules '${IANSEO_MODULES}' into ${CUSTOM_DIR}..."
+    if ! mkdir -p "$CUSTOM_DIR"; then
+        notify "WARN" "install_modules" "cannot create ${CUSTOM_DIR}"
+        return 0
+    fi
+
+    local installer="/tmp/ianseo_modules_install.sh"
+    if ! curl -fsSL "$MODULES_INSTALL_URL" -o "$installer" || [ ! -s "$installer" ]; then
+        notify "WARN" "install_modules" "could not download the modules installer"
+        rm -f "$installer"
+        return 0
+    fi
+
+    if ! IANSEO_LANG="$IANSEO_MODULES_LANG" bash "$installer" "$IANSEO_MODULES" "$CUSTOM_DIR" < /dev/null; then
+        notify "WARN" "install_modules" "module installation failed — continuing without modules"
+        rm -f "$installer"
+        return 0
+    fi
+    rm -f "$installer"
+
+    if [ ! -d "$CUSTOM_DIR/_shared" ]; then
+        notify "WARN" "install_modules" "installer finished but ${CUSTOM_DIR}/_shared is missing"
+        return 0
+    fi
+    notify "OK" "install_modules" "modules installed"
+}
+
 # ============================================================
 #  Main script
 # ============================================================
@@ -368,6 +422,7 @@ directory_prep
 download_ianseo
 extract_ianseo_zip
 ianseo_tweaks
+install_modules
 set_permissions
 update_ianseo
 generate_config
